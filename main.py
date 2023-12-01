@@ -16,7 +16,6 @@ def Findlastdigit(str2):
             ret=int(c)
     return ret
 
-
 def Findfirstdigitname(str1):
     ret=0
 
@@ -80,7 +79,6 @@ def Day1Pt1(inputfile):
     print('Day 1 Part 1')
     sum = 0
     for line in open(inputfile):
-
         res = Findfirstdigit(line) *10 + Findlastdigit(line)
         print(f'Line res: {line} {res}')
         sum = sum+res
@@ -88,10 +86,9 @@ def Day1Pt1(inputfile):
     print(f"Sum: {sum}")
 
 def Day1Pt2(inputfile):
-    print('Day 1 Part 1')
+    print('Day 1 Part 2')
     sum = 0
     for line in open(inputfile):
-
         res = Findfirstdigitname(line) *10 + Findlastdigitname(line)
         print(f'Line res: {line} {res}')
         sum = sum+res
@@ -103,4 +100,3 @@ if __name__ == '__main__':
     #Day1Pt1('input1_.txt')
     Day1Pt2('input1.txt')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
