@@ -123,12 +123,33 @@ def Day2Pt1(inputfile):
 
 def Day2Pt2(inputfile):
     print('Day 2 Part 2')
+
+    sum = 0
     for line in open(inputfile):
-        pass
+        minblue = mingreen = minred = 0
+
+        line = line.rstrip()
+        line = line + ';'
+        parts = line.split()
+        for i in range(2, len(parts), 2):
+            num = int(parts[i])
+            col = parts[i + 1][:-1]
+
+            if 'blue' == col:
+                minblue = max(minblue, num)
+            if 'green' == col:
+                mingreen = max(mingreen, num)
+            if 'red' == col:
+                minred = max(minred, num)
+
+        power = minblue * mingreen * minred
+        sum = sum + power
+
+    print(f'sum ID: {sum}')
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #Day1Pt1('input1_.txt')
     #Day1Pt2('input1.txt')
-    Day2Pt1('input2_.txt')
-    #Day2Pt2('input2.txt')
+    #Day2Pt1('input2_.txt')
+    Day2Pt2('input2_.txt')
