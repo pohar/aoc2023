@@ -95,8 +95,40 @@ def Day1Pt2(inputfile):
 
     print(f"Sum: {sum}")
 
+def Day2Pt1(inputfile):
+        print('Day 2 Part 1')
+        maxcols = {'blue': 14, "red":12, "green":13}
+
+        sum=0
+        for line in open(inputfile):
+            line = line.rstrip()
+            line = line + ';'
+            parts = line.split()
+            gameno = int(parts[1][:-1])
+            impossible = False
+            for i in range(2,len(parts),2):
+                num = parts[i]
+                col = parts[i + 1][:-1]
+                separator = parts[i + 1][-1]
+                maxcol = maxcols[col]
+                if int(num)>maxcol: #impossible
+                    impossible = True
+                #print(num, col, maxcol, separator)
+            #print(f'gameno:{gameno} impossible:{impossible}')
+            if not impossible:
+                sum = sum + gameno
+
+        print(f'sum ID: {sum}')
+
+
+def Day2Pt2(inputfile):
+    print('Day 2 Part 2')
+    for line in open(inputfile):
+        pass
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #Day1Pt1('input1_.txt')
-    Day1Pt2('input1.txt')
-
+    #Day1Pt2('input1.txt')
+    Day2Pt1('input2_.txt')
+    #Day2Pt2('input2.txt')
