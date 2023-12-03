@@ -1,3 +1,4 @@
+import re
 def Findfirstdigit(str1):
     ret=0
 
@@ -147,9 +148,69 @@ def Day2Pt2(inputfile):
 
     print(f'sum ID: {sum}')
 
+def Day3Pt1(inputfile):
+    print('Day 3 Part 1')
+
+    with open(inputfile, 'r') as f:
+        lines = f.readlines()
+        f.close()
+
+    GRID_SIZE_X = len(lines[0].strip())
+    GRID_SIZE_Y = len(lines)
+    print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+    grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+
+    y = 0
+    for line in lines:
+        #map_object = map(char, line.rstrip())
+        grid[y] = list(line.strip())
+        y = y + 1
+
+    y=0
+    sum=0
+    for line in lines:
+        x=0
+        matches = re.findall('(\d+)', line)
+        if matches:
+            for match in matches:
+                n = int(match)
+                x=line.find(match,x)
+                ln = len(match)
+                if x<0:
+                    hiba=1
+
+                #check neighbours
+                nok=True
+                for ny in range (y-1,y+2):
+                    for nx in range(x - 1, x + ln + 1):
+                        if (ny>=0) and (ny<GRID_SIZE_Y) and (nx>=0) and (nx<GRID_SIZE_X):
+                            if not((y==ny) and (nx>=x) and (nx<x+ln)):
+                                #print(f'x:{nx} y:{ny} {grid[ny][nx]}')
+                                if grid[ny][nx]!='.':
+                                    nok=False
+                                    break
+
+
+                print(f'found num: {n} ({x},{y}) OK:{not nok} ')
+                x=x+ln
+                if not nok:
+                    sum = sum + n
+
+        y=y+1
+    print(f'sum: {sum}') #  534249 , 535882, 518661, 517028, 517025 are bad answers
+
+def Day3Pt2(inputfile):
+    print('Day 3 Part 2')
+
+    sum = 0
+    for line in open(inputfile):
+        pass
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #Day1Pt1('input1_.txt')
     #Day1Pt2('input1.txt')
     #Day2Pt1('input2_.txt')
-    Day2Pt2('input2_.txt')
+    #Day2Pt2('input2_.txt')
+    Day3Pt1('input3.txt')
+    #Day3Pt2('input3_.txt')
