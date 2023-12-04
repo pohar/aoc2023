@@ -307,27 +307,22 @@ def Day4Pt2(inputfile):
 
     i=0
     for line in open(inputfile):
-        cardno , numbers = line.strip().split(":")
+        cardno , numbers = line.split(":")
         #print (cardno , numbers)
-        mynumbers_str, winnernums_str = numbers.strip().split('|')
-        mynumbers = mynumbers_str.strip().split(" ")
-        mynumbers = [i for i in mynumbers if i]
-        winnernums =winnernums_str.strip().split(" ")
-        winnernums = [i for i in winnernums if i]
+        mynumbers_str, winnernums_str = numbers.split('|')
+        mynumbers = mynumbers_str.split()
+        winnernums =winnernums_str.split()
 
         points =len(intersection(mynumbers,winnernums))
         if points>0:
             for j in range(i+1,i+points+1):
-                copies[j] = copies[j] + copies[i]
+                copies[j] += copies[i]
 
         i = i+1
 
-    sum=0
-    for j in range(0,i):
-        #print (copies[j])
-        sum = sum + copies[j]
+    total=sum(copies[:i])
 
-    print(f"sum: {sum}")
+    print(f"total: {total}") # 14814534
 
 
 def Day4Pt2x(inputfile):
@@ -364,4 +359,4 @@ if __name__ == '__main__':
     #Day3Pt2('input3.txt')
     #Day4Pt1('input4.txt')
     Day4Pt2('input4.txt')
-    Day4Pt2x('input4.txt')
+    #Day4Pt2x('input4.txt')
