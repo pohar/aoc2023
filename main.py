@@ -1,4 +1,5 @@
 import re
+from collections import Counter
 def Findfirstdigit(str1):
     ret=0
 
@@ -328,6 +329,31 @@ def Day4Pt2(inputfile):
 
     print(f"sum: {sum}")
 
+
+def Day4Pt2x(inputfile):
+    print('Day 4 Part 2 ChatGPT optimized version')
+
+    copies = [1] * 300
+    i = 0
+    with open(inputfile) as file:
+        for line in file:
+            cardno, numbers = map(str.strip, line.split(":"))
+            mynumbers_str, winnernums_str = map(str.strip, numbers.split('|'))
+
+            mynumbers = list(filter(None, mynumbers_str.split(" ")))
+            winnernums = list(filter(None, winnernums_str.split(" ")))
+
+            points = len(set(mynumbers) & set(winnernums))
+
+            if points > 0:
+                for j in range(i + 1, i + points + 1):
+                    copies[j] += copies[i]
+
+            i += 1
+
+    total_sum = sum(copies[:i])
+    print(f"sum: {total_sum}")
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #Day1Pt1('input1_.txt')
@@ -338,3 +364,4 @@ if __name__ == '__main__':
     #Day3Pt2('input3.txt')
     #Day4Pt1('input4.txt')
     Day4Pt2('input4.txt')
+    Day4Pt2x('input4.txt')
