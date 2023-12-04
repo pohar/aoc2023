@@ -197,14 +197,137 @@ def Day3Pt1(inputfile):
                     sum = sum + n
 
         y=y+1
-    print(f'sum: {sum}') #  534249 , 535882, 518661, 517028, 517025 are bad answers
+    print(f'sum: {sum}')
 
+
+def letterFrequency(fileName, letter):
+    # open file in read mode
+    file = open(fileName, 'r')
+
+    # store content of the file in a variable
+    text = file.read()
+
+    # using count()
+    return text.count(letter)
 def Day3Pt2(inputfile):
     print('Day 3 Part 2')
 
+    with open(inputfile, 'r') as f:
+        lines = f.readlines()
+        f.close()
+
+    print('number of stars:', letterFrequency(inputfile, '*'))
+
+    GRID_SIZE_X = len(lines[0].strip())
+    GRID_SIZE_Y = len(lines)
+    print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+    grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+
+    y = 0
+    for line in lines:
+        #map_object = map(char, line.rstrip())
+        grid[y] = list(line.strip())
+        y = y + 1
+
+    gears={}
+    gears_n={}
+    y=0
+    sum=0
+    for line in lines:
+        x=0
+        matches = re.findall('(\d+)', line)
+        if matches:
+            for match in matches:
+                n = int(match)
+                x=line.find(match,x)
+                ln = len(match)
+                if x<0:
+                    hiba=1
+
+                #find gears around numbers
+                for ny in range (y-1,y+2):
+                    for nx in range(x - 1, x + ln + 1):
+                        if (ny>=0) and (ny<GRID_SIZE_Y) and (nx>=0) and (nx<GRID_SIZE_X):
+                            if not((y==ny) and (nx>=x) and (nx<x+ln)):
+                                if grid[ny][nx]=='*': #found a gear
+                                    if (ny, nx) in gears_n.keys():
+                                        gears_n[(ny, nx)] = 1 + gears_n[(ny, nx)]
+                                        if( 2<gears_n[(ny, nx)]):
+                                            hiba=2
+                                    else:
+                                        gears_n[(ny, nx)] = 1
+
+                                    if (ny,nx) in gears.keys():
+                                        gears[(ny, nx)] = n*gears[(ny,nx)]
+                                    else:
+                                        gears[(ny,nx)] = n
+
+                                    break
+                x = x + ln
+
+        y=y+1
+    #print('number of gears:', len(gears),len(gears_n))
+    #print(gears)
+    #print(gears_n)
+
+    for keys in gears_n:
+        if gears_n[keys] == 2:
+            sum = sum + gears[keys]
+
+    print(f'sum: {sum}') # 163075488, 80671890, 79940686 are bad
+
+def intersection(lst1, lst2):
+    return list(set(lst1) & set(lst2))
+def Day4Pt1(inputfile):
+    print('Day 4 Part 1')
+
     sum = 0
     for line in open(inputfile):
-        pass
+        cardno , numbers = line.strip().split(":")
+       # print (cardno , numbers)
+        mynumbers_str, winnernums_str = numbers.strip().split('|')
+        mynumbers = mynumbers_str.strip().split(" ")
+        mynumbers = [i for i in mynumbers if i]
+        winnernums =winnernums_str.strip().split(" ")
+        winnernums = [i for i in winnernums if i]
+
+        points =len(intersection(mynumbers,winnernums))
+        if points>0:
+            points =2**(len(intersection(mynumbers,winnernums))-1)
+        #print(points)
+        sum = sum+points
+        #print(mynumbers, winnernums)
+    print(f"sum: {sum}")
+
+def Day4Pt2(inputfile):
+    print('Day 4 Part 2')
+
+    copies= [1]*300
+    points = [0] * 300
+
+    i=0
+    for line in open(inputfile):
+        cardno , numbers = line.strip().split(":")
+        #print (cardno , numbers)
+        mynumbers_str, winnernums_str = numbers.strip().split('|')
+        mynumbers = mynumbers_str.strip().split(" ")
+        mynumbers = [i for i in mynumbers if i]
+        winnernums =winnernums_str.strip().split(" ")
+        winnernums = [i for i in winnernums if i]
+
+        points[i] =len(intersection(mynumbers,winnernums))
+        if points[i]>0:
+            for j in range(i+1,i+points[i]+1):
+                copies[j] = copies[j] + copies[i]
+
+        i = i+1
+
+    sum=0
+    for j in range(0,i):
+        #print (copies[j])
+        sum = sum + copies[j]
+
+    print(f"sum: {sum}")
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -212,5 +335,7 @@ if __name__ == '__main__':
     #Day1Pt2('input1.txt')
     #Day2Pt1('input2_.txt')
     #Day2Pt2('input2_.txt')
-    Day3Pt1('input3.txt')
-    #Day3Pt2('input3_.txt')
+    #Day3Pt1('input3.txt')
+    #Day3Pt2('input3.txt')
+    #Day4Pt1('input4.txt')
+    Day4Pt2('input4.txt')
