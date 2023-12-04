@@ -303,7 +303,6 @@ def Day4Pt2(inputfile):
     print('Day 4 Part 2')
 
     copies= [1]*300
-    points = [0] * 300
 
     i=0
     for line in open(inputfile):
@@ -315,9 +314,9 @@ def Day4Pt2(inputfile):
         winnernums =winnernums_str.strip().split(" ")
         winnernums = [i for i in winnernums if i]
 
-        points[i] =len(intersection(mynumbers,winnernums))
-        if points[i]>0:
-            for j in range(i+1,i+points[i]+1):
+        points =len(intersection(mynumbers,winnernums))
+        if points>0:
+            for j in range(i+1,i+points+1):
                 copies[j] = copies[j] + copies[i]
 
         i = i+1
