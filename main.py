@@ -349,7 +349,62 @@ def Day4Pt2x(inputfile):
     total_sum = sum(copies[:i])
     print(f"sum: {total_sum}")
 
-# Press the green button in the gutter to run the script.
+def Day5Pt1(inputfile):
+    print('Day 5 Part 1')
+
+    for line in open(inputfile):
+        pass
+
+def Day5Pt1(inputfile):
+    print('Day 5 Part 1')
+
+    seeds=[]
+    maps=dict()
+    categories=[]
+
+    with open(inputfile, 'r') as f:
+        lines = f.readlines()
+        f.close()
+    maxy=len(lines)
+
+    y=0
+    seeds = list(map(int,lines[0].split()[1:]))
+    y+=1
+    for cat in range(0,7):
+        y +=1
+        src_cat, _ , dst_cat = lines[y].strip().split()[0].split('-')
+        categories.append(src_cat)
+        if cat==6:
+            categories.append(dst_cat)
+        y += 1
+        maps[(src_cat, dst_cat)]=[]
+        while '' != lines[y].strip():
+            dst_start, src_start, range_len = list(map(int,lines[y].strip().split()))
+            maps[((src_cat, dst_cat))].append((src_start, dst_start, range_len))
+            y += 1
+            if y>=maxy:
+                break
+
+    print("starting replace")
+    res=[]
+    for seed in seeds:
+        s=seed
+        #print("seed:", seed)
+        for cat in range(0,7):
+            replaces = maps[(categories[cat], categories[cat+1])]
+            for repl in replaces:
+                src_start, dst_start, range_len = repl
+                if s in range(src_start , src_start+range_len+1):
+                    s =  s - src_start + dst_start
+                    break
+            #print(categories[cat+1], s)
+        res.append(s)
+
+    print("seeds:",seeds)
+    print("res:",res)
+    print("min res:",min(res)) # 9607836 is too low
+    print('end')
+
 if __name__ == '__main__':
     #Day1Pt1('input1_.txt')
     #Day1Pt2('input1.txt')
@@ -358,5 +413,7 @@ if __name__ == '__main__':
     #Day3Pt1('input3.txt')
     #Day3Pt2('input3.txt')
     #Day4Pt1('input4.txt')
-    Day4Pt2('input4.txt')
+    #Day4Pt2('input4.txt')
     #Day4Pt2x('input4.txt')
+    Day5Pt1('input5.txt')
+    #Day5Pt2('input5_.txt')
