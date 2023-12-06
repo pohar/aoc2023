@@ -1,4 +1,5 @@
 import re
+import intervaltree
 from collections import Counter
 def Findfirstdigit(str1):
     ret=0
@@ -349,11 +350,6 @@ def Day4Pt2x(inputfile):
     total_sum = sum(copies[:i])
     print(f"sum: {total_sum}")
 
-def Day5Pt1(inputfile):
-    print('Day 5 Part 1')
-
-    for line in open(inputfile):
-        pass
 
 def Day5Pt1(inputfile):
     print('Day 5 Part 1')
@@ -405,6 +401,221 @@ def Day5Pt1(inputfile):
     print("min res:",min(res)) # 9607836 is too low
     print('end')
 
+
+def myFunc(e):
+    a,b,c = e
+    return a
+
+def overlap(a0, a1, b0, b1):
+    return a1 > b0 and a0 < b1
+
+def Day5Pt2(inputfile):
+    def calcseed(seed):
+        s = seed
+        output = str(s)
+        #print("seed:", seed)
+        for cat in range(0, 7):
+            replaces = maps[(categories[cat], categories[cat + 1])]
+            replaces.sort(key=myFunc)
+            #print(categories[cat], categories[cat + 1], replaces)
+            changed=False
+            for repl in replaces:
+                src_start, dst_start, range_len = repl
+                if s in range(src_start, src_start + range_len ):
+                    output = output + ' + ' + str(-src_start + dst_start)
+                    s = s - src_start + dst_start
+                    changed = True
+                    break
+            if not changed:
+                output = output + ' + 0'
+
+            #print(categories[cat+1], s)
+        output = output + ' -> ' + str(s)
+       # print(output)
+        return s
+
+    print('Day 5 Part 2')
+
+    seeds=[]
+    maps=dict()
+    categories=[]
+
+    with open(inputfile, 'r') as f:
+        lines = f.readlines()
+        f.close()
+    maxy=len(lines)
+
+    y=0
+    seeds = list(map(int,lines[0].split()[1:]))
+    y+=1
+    for cat in range(0,7):
+        y +=1
+        src_cat, _ , dst_cat = lines[y].strip().split()[0].split('-')
+        categories.append(src_cat)
+        if cat==6:
+            categories.append(dst_cat)
+        y += 1
+        maps[(src_cat, dst_cat)]=[]
+        while '' != lines[y].strip():
+            dst_start, src_start, range_len = list(map(int,lines[y].strip().split()))
+            maps[((src_cat, dst_cat))].append((src_start, dst_start, range_len))
+            y += 1
+            if y>=maxy:
+                break
+
+    print("***Maps:")
+    for cat in range(0, 7):
+        replaces = maps[(categories[cat], categories[cat + 1])]
+        replaces.sort(key=myFunc)
+        #print(categories[cat], categories[cat + 1], replaces)
+
+    results=[]
+    print("*** starting replace ")
+    for i in range(0,int(len(seeds)),2):
+        ranges = []
+        range_start = seeds [i]
+        range_end = range_start+seeds [i+1]
+        ranges.append((range_start,range_end))
+        print(f"range: {range_start:_};{range_end:_}")
+
+        for cat in range(0, 7):
+            replaces = maps[(categories[cat], categories[cat + 1])]
+            print((categories[cat], categories[cat + 1]))
+            replaces.sort(key=myFunc)
+
+            new_ranges=[]
+            overlapped=False
+            for range_start,range_end  in ranges:
+                for r_dst, r_start, r_num in replaces:
+                    r_end = r_start + r_num
+                    if overlap(range_start,range_end, r_start, r_start+r_num ):
+                        print(f"overlap: {range_start:_}, {range_end:_} : {r_start:_}, {r_end:_}")
+                        overlapped = True
+                        shift = r_start - r_dst
+                        print(f"shift: {shift:_}")
+                        if(range_start>=r_start) and (range_end<=r_end): #fits inside
+                            newrange_start = range_start
+                            newrange_end = range_end
+                            print(f"New range case1: {newrange_start:_}, {newrange_end:_}, {shift:_} -> {newrange_start+ shift:_} ,{newrange_end+ shift:_}" )
+                            new_ranges.append((newrange_start+ shift ,newrange_end+ shift))
+                        elif (range_start<r_start) and (range_end<r_end):
+                            newrange_start = r_start
+                            newrange_end = range_end
+                            print(f"New range case2: {newrange_start:_}, {newrange_end:_}, {shift:_} -> {newrange_start+ shift:_} ,{newrange_end+ shift:_}" )
+                            new_ranges.append((newrange_start+ shift ,newrange_end+ shift))
+                        elif (range_start>=r_start) and (range_end>r_end):
+                            newrange_start = range_start
+                            newrange_end = r_end
+                            print(f"New range case3: {newrange_start:_}, {newrange_end:_}, {shift:_} -> {newrange_start+ shift:_} ,{newrange_end+ shift:_}" )
+                            new_ranges.append((newrange_start+ shift ,newrange_end+ shift))
+                        elif (range_start<r_start) and (range_end>=r_end):
+                            newrange_start = r_start
+                            newrange_end = r_end
+                            print(f"New range case4: {newrange_start:_}, {newrange_end:_}, {shift:_} -> {newrange_start+ shift:_} ,{newrange_end+ shift:_}" )
+                            new_ranges.append((newrange_start+ shift ,newrange_end+ shift))
+                        else:
+                            not_implemented=1
+            if overlapped:
+                total_length = 0
+                for start, end in new_ranges:
+                    total_length += end - start
+                print('new ranges:', sorted(new_ranges), " sum len:", total_length)
+                ranges = new_ranges
+            else:
+                pass
+                #print('no overlap')
+
+        #for cs in range(range_start, range_end):
+            #s=calcseed(cs)
+            #print(cs,' -> ',s)
+
+        res = calcseed(ranges[0][0])
+        print('res: ',res , 'ranges:', len(ranges))
+        results.append(res)
+        #break
+
+    print('results:', results)
+    print("min res:",min(results))  # -866530663 is bad
+    print('end')
+
+def Day6Pt1(inputfile):
+    def calcdist(time, maxtime, startspeed=0):
+        speed = startspeed + time
+        dist = speed * (maxtime - time)
+        return dist
+
+    print('Day 6 Part 1')
+
+    with open(inputfile) as file:
+        for line in file:
+            if line.startswith("Time:"):
+                _, times_str = map(str.strip, line.split(":"))
+                times = list(map(int, times_str.split()))
+                print(times)
+            elif line.startswith("Distance:"):
+                _, distances_str = map(str.strip, line.split(":"))
+                distances = list(map(int, distances_str.split()))
+                print(distances)
+            else:
+                print("**** bad line ****")
+        if len(times)!= len(distances):
+            print("**** bad parse ****")
+
+    goods=1
+    for raceno in range(len(times)):
+        time = times[raceno]
+        distance = distances[raceno]
+        num_good = 0
+        for i in range(time+1):
+            d = calcdist(i,time)
+            #print(i,d)
+            if(d>distance):
+                num_good+=1
+        print(f'race: {raceno} {num_good}')
+        goods *= num_good
+
+    print("res: ",goods)
+
+def Day6Pt2(inputfile):
+    def calcdist(time, maxtime, startspeed=0):
+        speed = startspeed + time
+        dist = speed * (maxtime - time)
+        return dist
+
+    print('Day 6 Part 2')
+
+    with open(inputfile) as file:
+        for line in file:
+            line=line.replace(" ","")
+            if line.startswith("Time:"):
+                _, times_str = map(str.strip, line.split(":"))
+                times = list(map(int, times_str.split()))
+                print(times)
+            elif line.startswith("Distance:"):
+                _, distances_str = map(str.strip, line.split(":"))
+                distances = list(map(int, distances_str.split()))
+                print(distances)
+            else:
+                print("**** bad line ****")
+        if len(times)!= len(distances):
+            print("**** bad parse ****")
+
+    goods=1
+    for raceno in range(len(times)):
+        time = times[raceno]
+        distance = distances[raceno]
+        num_good = 0
+        for i in range(time+1):
+            d = calcdist(i,time)
+            #print(i,d)
+            if(d>distance):
+                num_good+=1
+        print(f'race: {raceno} {num_good}')
+        goods *= num_good
+
+    print("res: ",goods) # bad: 499221010971440
+
+
 if __name__ == '__main__':
     #Day1Pt1('input1_.txt')
     #Day1Pt2('input1.txt')
@@ -415,5 +626,7 @@ if __name__ == '__main__':
     #Day4Pt1('input4.txt')
     #Day4Pt2('input4.txt')
     #Day4Pt2x('input4.txt')
-    Day5Pt1('input5.txt')
-    #Day5Pt2('input5_.txt')
+    #Day5Pt1('input5.txt')
+    #Day5Pt2('input5.txt')
+    #Day6Pt1('input6.txt')
+    Day6Pt2('input6.txt')
