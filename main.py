@@ -1,6 +1,10 @@
 import re
+import time
 import intervaltree
 from collections import Counter
+from numba import jit
+from numba.typed import List
+
 def Findfirstdigit(str1):
     ret=0
 
@@ -402,42 +406,26 @@ def Day5Pt1(inputfile):
     print('end')
 
 
-def myFunc(e):
-    a,b,c = e
-    return a
 
-def overlap(a0, a1, b0, b1):
-    return a1 > b0 and a0 < b1
+@jit(nopython=True)
+def calc_range(maps, range_end, range_start, res):
+    for cs in range(range_start, range_end):
+        s=cs
+        for replaces in maps:
+            for src_start, dst_start, range_len in replaces:
+                if s in range(src_start, src_start + range_len):
+                    s = s - src_start + dst_start
+                    break
+        if s < res:
+            res = s
+    return res
 
 def Day5Pt2(inputfile):
-    def calcseed(seed):
-        s = seed
-        output = str(s)
-        #print("seed:", seed)
-        for cat in range(0, 7):
-            replaces = maps[(categories[cat], categories[cat + 1])]
-            replaces.sort(key=myFunc)
-            #print(categories[cat], categories[cat + 1], replaces)
-            changed=False
-            for repl in replaces:
-                src_start, dst_start, range_len = repl
-                if s in range(src_start, src_start + range_len ):
-                    output = output + ' + ' + str(-src_start + dst_start)
-                    s = s - src_start + dst_start
-                    changed = True
-                    break
-            if not changed:
-                output = output + ' + 0'
-
-            #print(categories[cat+1], s)
-        output = output + ' -> ' + str(s)
-       # print(output)
-        return s
-
     print('Day 5 Part 2')
 
+    starttime = time.time()
     seeds=[]
-    maps=dict()
+    maps = List()
     categories=[]
 
     with open(inputfile, 'r') as f:
@@ -448,95 +436,38 @@ def Day5Pt2(inputfile):
     y=0
     seeds = list(map(int,lines[0].split()[1:]))
     y+=1
-    for cat in range(0,7):
+    for cat in range(7):
         y +=1
         src_cat, _ , dst_cat = lines[y].strip().split()[0].split('-')
         categories.append(src_cat)
         if cat==6:
             categories.append(dst_cat)
         y += 1
-        maps[(src_cat, dst_cat)]=[]
+        newmap=List()
         while '' != lines[y].strip():
             dst_start, src_start, range_len = list(map(int,lines[y].strip().split()))
-            maps[((src_cat, dst_cat))].append((src_start, dst_start, range_len))
+            newmap.append((src_start, dst_start, range_len))
             y += 1
             if y>=maxy:
                 break
+        maps.append(newmap)
 
-    print("***Maps:")
-    for cat in range(0, 7):
-        replaces = maps[(categories[cat], categories[cat + 1])]
-        replaces.sort(key=myFunc)
-        #print(categories[cat], categories[cat + 1], replaces)
-
-    results=[]
+    res=999999999999
     print("*** starting replace ")
-    for i in range(0,int(len(seeds)),2):
-        ranges = []
+    for i in range(0,len(seeds),2):
+        startrange = time.time()
         range_start = seeds [i]
         range_end = range_start+seeds [i+1]
-        ranges.append((range_start,range_end))
         print(f"range: {range_start:_};{range_end:_}")
 
-        for cat in range(0, 7):
-            replaces = maps[(categories[cat], categories[cat + 1])]
-            print((categories[cat], categories[cat + 1]))
-            replaces.sort(key=myFunc)
+        res = calc_range(maps, range_end, range_start, res)
+        endrange = time.time()
+        print('range end time: ',endrange-startrange,' res so far: ', res)
 
-            new_ranges=[]
-            overlapped=False
-            for range_start,range_end  in ranges:
-                for r_dst, r_start, r_num in replaces:
-                    r_end = r_start + r_num
-                    if overlap(range_start,range_end, r_start, r_start+r_num ):
-                        print(f"overlap: {range_start:_}, {range_end:_} : {r_start:_}, {r_end:_}")
-                        overlapped = True
-                        shift = r_start - r_dst
-                        print(f"shift: {shift:_}")
-                        if(range_start>=r_start) and (range_end<=r_end): #fits inside
-                            newrange_start = range_start
-                            newrange_end = range_end
-                            print(f"New range case1: {newrange_start:_}, {newrange_end:_}, {shift:_} -> {newrange_start+ shift:_} ,{newrange_end+ shift:_}" )
-                            new_ranges.append((newrange_start+ shift ,newrange_end+ shift))
-                        elif (range_start<r_start) and (range_end<r_end):
-                            newrange_start = r_start
-                            newrange_end = range_end
-                            print(f"New range case2: {newrange_start:_}, {newrange_end:_}, {shift:_} -> {newrange_start+ shift:_} ,{newrange_end+ shift:_}" )
-                            new_ranges.append((newrange_start+ shift ,newrange_end+ shift))
-                        elif (range_start>=r_start) and (range_end>r_end):
-                            newrange_start = range_start
-                            newrange_end = r_end
-                            print(f"New range case3: {newrange_start:_}, {newrange_end:_}, {shift:_} -> {newrange_start+ shift:_} ,{newrange_end+ shift:_}" )
-                            new_ranges.append((newrange_start+ shift ,newrange_end+ shift))
-                        elif (range_start<r_start) and (range_end>=r_end):
-                            newrange_start = r_start
-                            newrange_end = r_end
-                            print(f"New range case4: {newrange_start:_}, {newrange_end:_}, {shift:_} -> {newrange_start+ shift:_} ,{newrange_end+ shift:_}" )
-                            new_ranges.append((newrange_start+ shift ,newrange_end+ shift))
-                        else:
-                            not_implemented=1
-            if overlapped:
-                total_length = 0
-                for start, end in new_ranges:
-                    total_length += end - start
-                print('new ranges:', sorted(new_ranges), " sum len:", total_length)
-                ranges = new_ranges
-            else:
-                pass
-                #print('no overlap')
+    endtime = time.time()
+    print('ended in:', endtime-starttime)
+    print('final res: ',res)
 
-        #for cs in range(range_start, range_end):
-            #s=calcseed(cs)
-            #print(cs,' -> ',s)
-
-        res = calcseed(ranges[0][0])
-        print('res: ',res , 'ranges:', len(ranges))
-        results.append(res)
-        #break
-
-    print('results:', results)
-    print("min res:",min(results))  # -866530663 is bad
-    print('end')
 
 def Day6Pt1(inputfile):
     def calcdist(time, maxtime, startspeed=0):
@@ -627,6 +558,6 @@ if __name__ == '__main__':
     #Day4Pt2('input4.txt')
     #Day4Pt2x('input4.txt')
     #Day5Pt1('input5.txt')
-    #Day5Pt2('input5.txt')
+    Day5Pt2('input5.txt')
     #Day6Pt1('input6.txt')
-    Day6Pt2('input6.txt')
+    #Day6Pt2('input6.txt')
