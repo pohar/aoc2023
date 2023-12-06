@@ -406,7 +406,6 @@ def Day5Pt1(inputfile):
     print('end')
 
 
-
 @jit(nopython=True)
 def calc_range(maps, range_end, range_start, res):
     for cs in range(range_start, range_end):
@@ -466,7 +465,7 @@ def Day5Pt2(inputfile):
 
     endtime = time.time()
     print('ended in:', endtime-starttime)
-    print('final res: ',res)
+    print('final res: ',res) # 79004094
 
 
 def Day6Pt1(inputfile):
@@ -546,6 +545,41 @@ def Day6Pt2(inputfile):
 
     print("res: ",goods) # bad: 499221010971440
 
+def Day7Pt1(inputfile):
+    print('Day 7 Part 1')
+    starttime = time.time()
+
+    with open(inputfile) as file:
+        for line in file:
+            pass
+
+    endtime = time.time()
+    print('ended in:', endtime-starttime)
+    print("End.")
+
+def Day7Pt2(inputfile):
+    print('Day 7 Part 2')
+    starttime = time.time()
+
+    with open(inputfile) as file:
+        for line in file:
+            pass
+
+    endtime = time.time()
+    print('ended in:', endtime - starttime)
+    print("End.")
+
+def DayXPtY(inputfile):
+    print('Day X Part Y')
+    start_time = time.time()
+
+    with open(inputfile) as file:
+        for line in file:
+            pass
+
+    end_time = time.time()
+    print('ended in:', end_time-start_time)
+    print("End.")
 
 if __name__ == '__main__':
     #Day1Pt1('input1_.txt')
@@ -558,6 +592,8 @@ if __name__ == '__main__':
     #Day4Pt2('input4.txt')
     #Day4Pt2x('input4.txt')
     #Day5Pt1('input5.txt')
-    Day5Pt2('input5.txt')
+    #Day5Pt2('input5.txt')
     #Day6Pt1('input6.txt')
     #Day6Pt2('input6.txt')
+    Day7Pt1('input7_.txt')
+    #Day7Pt2('input7.txt')
