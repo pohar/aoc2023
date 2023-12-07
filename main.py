@@ -545,30 +545,142 @@ def Day6Pt2(inputfile):
 
     print("res: ",goods) # bad: 499221010971440
 
+def GetType(card):
+    type=0
+    sorted_card = sorted(card)
+    setcard = set(card)
+    if 1 == len(setcard): # Five of a kind
+        type = 1
+    elif 2 == len(setcard): # Four of a kind or Full House
+        cnt = card.count(card[0])
+        if cnt in [1,4]:
+            type = 2  # Four of a kind
+        else:
+            type = 3 # Full House
+    elif 3 == len(setcard): # Three of a kind or Two pair
+        if (2== card.count(card[0])) or (2== card.count(card[1])):
+            type = 5 # Two pair
+        else:
+            type = 4 # Three of a kind
+    elif 4 == len(setcard):  # One pair
+        type = 6
+    elif 5 == len(setcard):  # High card
+        type = 7
+    else:
+        print('Unknown hand type:', card)
+
+    return type
 def Day7Pt1(inputfile):
     print('Day 7 Part 1')
     starttime = time.time()
 
+    hands=[] #List()
+    bids=[] #List()
     with open(inputfile) as file:
         for line in file:
-            pass
+            hand,bid = line.split()
+            hand_orig = hand
+            hand=hand.replace('A','F')
+            hand=hand.replace('K','E')
+            hand=hand.replace('Q','D')
+            hand=hand.replace('J','C')
+            hand=hand.replace('T','B')
+            hands.append((hand,bid,GetType(hand),hand_orig))
+
+    #sort
+    print("Start sorting")
+    hands.sort(key=lambda x: x[0])
+    hands.sort(key=lambda x: x[2], reverse=True)
+
+    #sum
+    print("Calc result")
+    sum = 0
+    i=1
+    for _,bid,_,_ in hands:
+        sum += i*int(bid)
+        i +=1
 
     endtime = time.time()
     print('ended in:', endtime-starttime)
+    print("res:",sum)
     print("End.")
+
+def GetType2(ocard):
+    def most_frequent(List):
+        counter = 0
+        num = List[0]
+
+        for i in List:
+            if '1'!=i:
+                curr_frequency = List.count(i)
+                if (curr_frequency > counter):
+                    counter = curr_frequency
+                    num = i
+
+        return num
+
+    type=0
+    sorted_card = sorted(ocard)
+    mostcommon = most_frequent(sorted_card)
+    card = ocard.replace("1", mostcommon)
+    setcard = set(card)
+    if 1 == len(setcard): # Five of a kind
+        type = 1
+    elif 2 == len(setcard): # Four of a kind or Full House
+        cnt = card.count(card[0])
+        if cnt in [1,4]:
+            type = 2  # Four of a kind
+        else:
+            type = 3 # Full House
+    elif 3 == len(setcard): # Three of a kind or Two pair
+        if (2== card.count(card[0])) or (2== card.count(card[1])):
+            type = 5 # Two pair
+        else:
+            type = 4 # Three of a kind
+    elif 4 == len(setcard):  # One pair
+        type = 6
+    elif 5 == len(setcard):  # High card
+        type = 7
+    else:
+        print('Unknown hand type:', card)
+
+    return type
 
 def Day7Pt2(inputfile):
     print('Day 7 Part 2')
     starttime = time.time()
 
+    hands=[] #List()
+    bids=[] #List()
     with open(inputfile) as file:
         for line in file:
-            pass
+            hand,bid = line.split()
+            hand_orig = hand
+            hand=hand.replace('A','F')
+            hand=hand.replace('K','E')
+            hand=hand.replace('Q','D')
+            hand=hand.replace('J','1')
+            hand=hand.replace('T','B')
+            hands.append((hand,bid,GetType2(hand),hand_orig))
+
+    #sort
+    print("Start sorting")
+    hands.sort(key=lambda x: x[0])
+    hands.sort(key=lambda x: x[2], reverse=True)
+
+    #sum
+    print("Calc result")
+    sum = 0
+    i=1
+    for _,bid,_,_ in hands:
+        sum += i*int(bid)
+        i +=1
 
     endtime = time.time()
-    print('ended in:', endtime - starttime)
+    print('ended in:', endtime-starttime)
+    #print(hands)
+    print("res:",sum)
     print("End.")
-
 def DayXPtY(inputfile):
     print('Day X Part Y')
     start_time = time.time()
@@ -595,5 +707,5 @@ if __name__ == '__main__':
     #Day5Pt2('input5.txt')
     #Day6Pt1('input6.txt')
     #Day6Pt2('input6.txt')
-    Day7Pt1('input7_.txt')
-    #Day7Pt2('input7.txt')
+    #Day7Pt1('input7.txt')
+    Day7Pt2('input7.txt')
