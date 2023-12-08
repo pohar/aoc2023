@@ -620,8 +620,7 @@ def GetType2(ocard):
         return num
 
     type=0
-    sorted_card = sorted(ocard)
-    mostcommon = most_frequent(sorted_card)
+    mostcommon = most_frequent(ocard)
     card = ocard.replace("1", mostcommon)
     setcard = set(card)
     if 1 == len(setcard): # Five of a kind
@@ -681,15 +680,138 @@ def Day7Pt2(inputfile):
     #print(hands)
     print("res:",sum)
     print("End.")
-def DayXPtY(inputfile):
-    print('Day X Part Y')
+
+def Day8Pt1(inputfile):
+    print('Day 8 Part 1')
     start_time = time.time()
 
+    instr = ""
+    navi = {}
     with open(inputfile) as file:
         for line in file:
-            pass
+            if len(line) <=1:
+                continue
+            if 0==line.count("=") :
+                instr = line.strip()
+            else:
+                start = line.split()[0]
+                left = line.split()[2][1:-1]
+                right = line.split()[3][:-1]
+                navi[start]=(left,right)
+    print(instr)
+    print(navi)
+
+    #navigate
+    print("navi start")
+    pos='AAA'
+    i=0
+    leni = len(instr)
+    step=0
+    while 'ZZZ' != pos:
+        print(step, pos)
+        nexti = instr[ i % leni]
+        left_next, right_next = navi[pos]
+        if 'L' == nexti:
+            pos = left_next
+        elif 'R' == nexti:
+            pos = right_next
+
+        step +=1
+        i +=1 #end of while!!!
 
     end_time = time.time()
+    print("steps:", step)
+    print('ended in:', end_time-start_time)
+    print("End.")
+
+def prime_factorization(n):
+    prime_factors = []
+    i = 2
+    while i * i <= n:
+        if n % i:
+            i += 1
+        else:
+            n //= i
+            prime_factors.append(i)
+    if n > 1:
+        prime_factors.append(n)
+    return prime_factors
+
+def least_common_multiple(numbers):
+    unified_factors = {}
+    for number in numbers:
+        prime_factors = prime_factorization(number)
+        current_factors = {}
+        for factor in prime_factors:
+            if factor not in current_factors:
+                current_factors[factor] = 1
+            else:
+                current_factors[factor] += 1
+        for factor, exponent in current_factors.items():
+            if factor not in unified_factors or exponent > unified_factors[factor]:
+                unified_factors[factor] = exponent
+
+    result = 1
+    for factor, exponent in unified_factors.items():
+        result *= factor ** exponent
+
+    return result
+
+def Day8Pt2(inputfile):
+    print('Day 8 Part 2')
+    start_time = time.time()
+
+    instr = ""
+    navi = {}
+    starts=[]
+    with open(inputfile) as file:
+        for line in file:
+            if len(line) <=1:
+                continue
+            if 0==line.count("=") :
+                instr = line.strip()
+            else:
+                start = line.split()[0]
+                if start.endswith("A"):
+                    starts.append(start)
+                left = line.split()[2][1:-1]
+                right = line.split()[3][:-1]
+                navi[start]=(left,right)
+    print(instr)
+    print(navi)
+
+    #navigate
+    print("navi start")
+    pos=starts
+    leni = len(instr)
+    step=0
+    cycles=[]
+    pi=0
+    for p in pos:
+        i = 0
+        step = 0
+        print(p, end=" ")
+        finished = False
+        while not finished:
+            nexti = instr[i % leni]
+            left_next, right_next = navi[pos[pi]]
+            if 'L' == nexti:
+                pos[pi] = left_next
+            elif 'R' == nexti:
+                pos[pi] = right_next
+            if pos[pi].endswith('Z'):
+                finished = True
+            step +=1
+            i +=1
+        print("steps:", step)
+        cycles.append(step)
+        pi +=1
+
+    lcm = least_common_multiple(cycles)
+    print(f"The least common multiple of the given numbers is: {lcm}")
+
+    end_time = time.time()
+    #print("steps:", step)
     print('ended in:', end_time-start_time)
     print("End.")
 
@@ -708,4 +830,6 @@ if __name__ == '__main__':
     #Day6Pt1('input6.txt')
     #Day6Pt2('input6.txt')
     #Day7Pt1('input7.txt')
-    Day7Pt2('input7.txt')
+    #Day7Pt2('input7.txt')
+    #Day8Pt1('input8.txt')
+    Day8Pt2('input8.txt')
