@@ -780,6 +780,31 @@ def Day8Pt2(inputfile):
     print('ended in:', end_time-start_time)
     print("End.")
 
+def Day9Pt1(inputfile):
+    print('Day 9 Part 1')
+    start_time = time.time()
+
+    with open(inputfile) as file:
+        for line in file:
+            pass
+
+    end_time = time.time()
+    print('ended in:', end_time-start_time)
+    print("End.")
+
+def Day9Pt2(inputfile):
+    print('Day 9 Part 2')
+    start_time = time.time()
+
+    with open(inputfile) as file:
+        for line in file:
+            pass
+
+    end_time = time.time()
+    print('ended in:', end_time-start_time)
+    print("End.")
+
+
 if __name__ == '__main__':
     #Day1Pt1('input1_.txt')
     #Day1Pt2('input1.txt')
@@ -797,4 +822,6 @@ if __name__ == '__main__':
     #Day7Pt1('input7.txt')
     #Day7Pt2('input7.txt')
     #Day8Pt1('input8.txt')
-    Day8Pt2('input8.txt')
+    #Day8Pt2('input8.txt')
+    Day9Pt1('input9_.txt')
+    #Day9Pt2('input9.txt')
