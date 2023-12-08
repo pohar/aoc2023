@@ -1,9 +1,10 @@
 import re
 import time
-import intervaltree
 from collections import Counter
 from numba import jit
 from numba.typed import List
+import math
+
 
 def Findfirstdigit(str1):
     ret=0
@@ -103,29 +104,29 @@ def Day1Pt2(inputfile):
     print(f"Sum: {sum}")
 
 def Day2Pt1(inputfile):
-        print('Day 2 Part 1')
-        maxcols = {'blue': 14, "red":12, "green":13}
+    print('Day 2 Part 1')
+    maxcols = {'blue': 14, "red":12, "green":13}
 
-        sum=0
-        for line in open(inputfile):
-            line = line.rstrip()
-            line = line + ';'
-            parts = line.split()
-            gameno = int(parts[1][:-1])
-            impossible = False
-            for i in range(2,len(parts),2):
-                num = parts[i]
-                col = parts[i + 1][:-1]
-                separator = parts[i + 1][-1]
-                maxcol = maxcols[col]
-                if int(num)>maxcol: #impossible
-                    impossible = True
-                #print(num, col, maxcol, separator)
-            #print(f'gameno:{gameno} impossible:{impossible}')
-            if not impossible:
-                sum = sum + gameno
+    sum=0
+    for line in open(inputfile):
+        line = line.rstrip()
+        line = line + ';'
+        parts = line.split()
+        gameno = int(parts[1][:-1])
+        impossible = False
+        for i in range(2,len(parts),2):
+            num = parts[i]
+            col = parts[i + 1][:-1]
+            separator = parts[i + 1][-1]
+            maxcol = maxcols[col]
+            if int(num)>maxcol: #impossible
+                impossible = True
+            #print(num, col, maxcol, separator)
+        #print(f'gameno:{gameno} impossible:{impossible}')
+        if not impossible:
+            sum = sum + gameno
 
-        print(f'sum ID: {sum}')
+    print(f'sum ID: {sum}')
 
 
 def Day2Pt2(inputfile):
@@ -176,7 +177,7 @@ def Day3Pt1(inputfile):
     sum=0
     for line in lines:
         x=0
-        matches = re.findall('(\d+)', line)
+        matches = re.findall(r'(\d+)', line)
         if matches:
             for match in matches:
                 n = int(match)
@@ -241,7 +242,7 @@ def Day3Pt2(inputfile):
     sum=0
     for line in lines:
         x=0
-        matches = re.findall('(\d+)', line)
+        matches = re.findall(r'(\d+)', line)
         if matches:
             for match in matches:
                 n = int(match)
@@ -290,7 +291,7 @@ def Day4Pt1(inputfile):
     sum = 0
     for line in open(inputfile):
         cardno , numbers = line.strip().split(":")
-       # print (cardno , numbers)
+        # print (cardno , numbers)
         mynumbers_str, winnernums_str = numbers.strip().split('|')
         mynumbers = mynumbers_str.strip().split(" ")
         mynumbers = [i for i in mynumbers if i]
@@ -784,7 +785,6 @@ def Day8Pt2(inputfile):
     print("navi start")
     pos=starts
     leni = len(instr)
-    step=0
     cycles=[]
     pi=0
     for p in pos:
@@ -807,11 +807,10 @@ def Day8Pt2(inputfile):
         cycles.append(step)
         pi +=1
 
-    lcm = least_common_multiple(cycles)
-    print(f"The least common multiple of the given numbers is: {lcm}")
+    lcmm = math.lcm(*cycles)
+    print(f"The least common multiple of the given numbers is: {lcmm}")
 
     end_time = time.time()
-    #print("steps:", step)
     print('ended in:', end_time-start_time)
     print("End.")
 
