@@ -725,44 +725,10 @@ def Day8Pt1(inputfile):
     print('ended in:', end_time-start_time)
     print("End.")
 
-def prime_factorization(n):
-    prime_factors = []
-    i = 2
-    while i * i <= n:
-        if n % i:
-            i += 1
-        else:
-            n //= i
-            prime_factors.append(i)
-    if n > 1:
-        prime_factors.append(n)
-    return prime_factors
-
-def least_common_multiple(numbers):
-    unified_factors = {}
-    for number in numbers:
-        prime_factors = prime_factorization(number)
-        current_factors = {}
-        for factor in prime_factors:
-            if factor not in current_factors:
-                current_factors[factor] = 1
-            else:
-                current_factors[factor] += 1
-        for factor, exponent in current_factors.items():
-            if factor not in unified_factors or exponent > unified_factors[factor]:
-                unified_factors[factor] = exponent
-
-    result = 1
-    for factor, exponent in unified_factors.items():
-        result *= factor ** exponent
-
-    return result
-
 def Day8Pt2(inputfile):
     print('Day 8 Part 2')
     start_time = time.time()
 
-    instr = ""
     navi = {}
     starts=[]
     with open(inputfile) as file:
