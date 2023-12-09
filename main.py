@@ -781,26 +781,66 @@ def Day8Pt2(inputfile):
     print("End.")
 
 def Day9Pt1(inputfile):
+    def extend(s): #recursion
+        i=0;
+        diffs=[]
+        for i in range(len(s)-1):
+            diff = s[i+1] - s[i]
+            diffs.append(diff)
+        if all([v == 0 for v in s]):
+            s.append(0)
+            return 0
+        else:
+            s.append(s[-1]+extend(diffs))
+        #print(s)
+        return s[-1]
+
     print('Day 9 Part 1')
     start_time = time.time()
 
+    sum=0
     with open(inputfile) as file:
         for line in file:
-            pass
+            nums = list(map(int,(line.split())))
+            res=extend(nums)
+            sum +=res
+            print(f'input:{nums} : {res}')
+
 
     end_time = time.time()
+    print("res:",sum)
     print('ended in:', end_time-start_time)
     print("End.")
 
 def Day9Pt2(inputfile):
+    def extend(s): #recursion
+        i=0;
+        diffs=[]
+        for i in range(len(s)-1):
+            diff = s[i+1] - s[i]
+            diffs.append(diff)
+        if all([v == 0 for v in s]):
+            s.insert(0,1)
+            return 0
+        else:
+            s.insert(0, s[0]-extend(diffs))
+        #print(s)
+        return s[0]
+
     print('Day 9 Part 2')
     start_time = time.time()
 
+    sum=0
     with open(inputfile) as file:
         for line in file:
-            pass
+            nums = list(map(int,(line.split())))
+            res=extend(nums)
+            sum +=res
+            print(f'input:{nums} : {res}')
+
 
     end_time = time.time()
+    print("res:",sum)
     print('ended in:', end_time-start_time)
     print("End.")
 
@@ -823,5 +863,5 @@ if __name__ == '__main__':
     #Day7Pt2('input7.txt')
     #Day8Pt1('input8.txt')
     #Day8Pt2('input8.txt')
-    Day9Pt1('input9_.txt')
-    #Day9Pt2('input9.txt')
+    #Day9Pt1('input9.txt')
+    Day9Pt2('input9.txt')
