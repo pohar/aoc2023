@@ -1351,6 +1351,59 @@ def Day11Pt2(inputfile):
 
 	print("End.")
 
+def Day12Pt1(inputfile):
+	print('Day 12 Part 1')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	GRID_SIZE_X = len(lines[0].strip())
+	GRID_SIZE_Y = len(lines)
+	print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+	grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+
+	y = 0
+	jumpy=[]
+	for line in lines:
+		#map_object = map(char, line.rstrip())
+		grid[y] = list(line.strip())
+
+	res=0
+
+
+	print('res:',res) #
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
+
+def Day12Pt2(inputfile):
+	print('Day 12 Part 2')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	GRID_SIZE_X = len(lines[0].strip())
+	GRID_SIZE_Y = len(lines)
+	print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+	grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+
+	y = 0
+	jumpy=[]
+	for line in lines:
+		#map_object = map(char, line.rstrip())
+		grid[y] = list(line.strip())
+
+	res=0
+
+
+	print('res:',res) #
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
 if __name__ == '__main__':
 	#Day1Pt1('input1_.txt')
 	#Day1Pt2('input1.txt')
@@ -1374,4 +1427,6 @@ if __name__ == '__main__':
 	#Day10Pt1('input10.txt')
 	#Day10Pt2('input10.txt')
 	#Day11Pt1('input11.txt')
-	Day11Pt2('input11.txt')
+	#Day11Pt2('input11.txt')
+	Day12Pt1('input12_.txt')
+	#Day12Pt2('input12.txt')
