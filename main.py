@@ -1219,6 +1219,138 @@ def Day10Pt2(inputfile):
 
 	print("End.")
 
+def Day11Pt1(inputfile):
+	print('Day 11 Part 1')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	GRID_SIZE_X = len(lines[0].strip())
+	GRID_SIZE_Y = len(lines)
+	print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+	grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+
+	y = 0
+	for line in lines:
+		#map_object = map(char, line.rstrip())
+		grid[y] = list(line.strip())
+		if 0== grid[y].count('#'): #expand y
+			y += 1
+			grid.insert(y, list(line.strip()))
+			GRID_SIZE_Y += 1
+		y+=1
+
+	#expand x
+	for x in range(GRID_SIZE_X-1, 0, -1):
+		alldot=True
+		for y in range(GRID_SIZE_Y):
+			if '.' != grid[y][x]:
+				alldot = False
+				break
+		if alldot:
+			for y in range(GRID_SIZE_Y):
+				grid[y].insert(x,'.')
+			GRID_SIZE_X += 1
+
+	#find galaxies:
+	galaxies=[]
+	for y in range(GRID_SIZE_Y):
+		for x in range(GRID_SIZE_X):
+			if "#"==grid[y][x]:
+				galaxies.append((y,x,1+len(galaxies)))
+
+	print('gal:', galaxies)
+
+	res=0
+	#distances=dict()
+	for i in range(len(galaxies)-1):
+		bestdist=9999999
+		for j in range(i+1, len(galaxies)):
+			x1,y1,i1=galaxies[i]
+			x2,y2,i2=galaxies[j]
+			dist=abs(x1-x2)+abs(y1-y2)
+			res += dist
+
+
+	print('res:',res) #
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
+
+	print("End.")
+
+def Day11Pt2(inputfile):
+	print('Day 11 Part 2')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	GRID_SIZE_X = len(lines[0].strip())
+	GRID_SIZE_Y = len(lines)
+	print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+	grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+
+	y = 0
+	jumpy=[]
+	for line in lines:
+		#map_object = map(char, line.rstrip())
+		grid[y] = list(line.strip())
+		if 0== grid[y].count('#'): #expand y
+			jumpy.append(y)
+		y+=1
+	print('jumpy:', jumpy)
+
+	#expand x
+	jumpx=[]
+	for x in range(GRID_SIZE_X):
+		alldot=True
+		for y in range(GRID_SIZE_Y):
+			if '.' != grid[y][x]:
+				alldot = False
+				break
+		if alldot:
+			jumpx.append(x)
+	print('jumpx:', jumpx)
+
+	#find galaxies:
+	galaxies=[]
+	for y in range(GRID_SIZE_Y):
+		for x in range(GRID_SIZE_X):
+			if "#"==grid[y][x]:
+				galaxies.append((y,x,1+len(galaxies)))
+
+	print('gal:', galaxies)
+
+	res=0
+	for i in range(len(galaxies)-1):
+		for k in range(i+1, len(galaxies)):
+			y1,x1,i1=galaxies[i]
+			y2,x2,i2=galaxies[k]
+			jumpsx=0
+			for j in jumpx:
+				if j>(min(x1,x2)) and j<max(x1,x2):
+					jumpsx +=1
+			jumpsy=0
+			for j in jumpy:
+				if j>(min(y1,y2)) and j<max(y1,y2):
+					jumpsy +=1
+
+			jumps = jumpsx+jumpsy
+			dist=abs(x1-x2)+abs(y1-y2) + jumps * (1_000_000-1) #1_000_000
+			#print(i+1, k+1, abs(x1-x2),abs(y1-y2), jumpsx,jumpsy ,dist)
+			res += dist
+
+	print('res:',res) #
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
+
+	print("End.")
+
 if __name__ == '__main__':
 	#Day1Pt1('input1_.txt')
 	#Day1Pt2('input1.txt')
@@ -1240,4 +1372,6 @@ if __name__ == '__main__':
 	#Day9Pt1('input9.txt')
 	#Day9Pt2('input9.txt')
 	#Day10Pt1('input10.txt')
-	Day10Pt2('input10.txt')
+	#Day10Pt2('input10.txt')
+	#Day11Pt1('input11.txt')
+	Day11Pt2('input11.txt')
