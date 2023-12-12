@@ -1355,25 +1355,15 @@ def Day11Pt2(inputfile):
 def Day12Pt1(inputfile):
 	def linechecker(cond, nfo):
 		ret = False
-		cond_len = len(cond) #expected sum of dots and #s
-		suminfo= sum(nfo) # expected number of #s
-		dots = len(nfo)-1 #expectedFailure() num of dots
-
-		nhash = cond.count('#')
-		ndot = cond.count('.')
-		num_separators = suminfo - cond_len # nuber of dots
-
-		result = re.findall(r"([[#]+)", cond)
-		if result:
-			found_hash_groups = len(result)
-			if found_hash_groups == len(nfo):
-				partsok=True
-				for i in range(found_hash_groups):
-					if nfo[i]!= len(result[i]):
-						partsok = False
-				if partsok:
-					ret = True
-
+		result = re.findall(r"([#]+)", cond)
+		found_hash_groups = len(result)
+		if found_hash_groups == len(nfo):
+			partsok=True
+			for i in range(found_hash_groups):
+				if nfo[i]!= len(result[i]):
+					partsok = False
+			if partsok:
+				ret = True
 		return ret
 
 	print('Day 12 Part 1')
@@ -1392,7 +1382,7 @@ def Day12Pt1(inputfile):
 			print (condition, info, ret)
 		else:
 			nques = condition.count('?')
-			missing_dots = len(condition) - sum(info)- condition.count(".") # expectedFailure() num of new dots
+			missing_dots = len(condition) - sum(info)- condition.count(".")
 			prod = list(product('#.', repeat=nques))
 			for pp in prod:
 				j = 0
@@ -1409,14 +1399,43 @@ def Day12Pt1(inputfile):
 							j +=1
 					if linechecker(test, info):
 						res += 1
-					#print (condition, info, test, ret)
-
-
+		#print (condition, info,  dres)
 
 	print('res:',res) #
 	end_time = time.time()
 	print('ended in:', end_time-start_time)
 
+
+def linechecker(cond, nfo):
+	ret = False
+	result = re.findall(r"([#]+)", cond)
+	if result:
+		found_hash_groups = len(result)
+		if found_hash_groups == len(nfo):
+			partsok=True
+			for i in range(found_hash_groups):
+				if nfo[i]!= len(result[i]):
+					partsok = False
+			if partsok:
+				ret = True
+
+	return ret
+
+
+#@jit(nopython=True)
+def generate_combinations(prefix, n, m, res):
+	if n == 0 and m == 0:
+		res.append(prefix)
+		return
+	if n > 0:
+		generate_combinations(prefix + '#', n - 1, m, res)
+	if m > 0:
+		generate_combinations(prefix + '.', n, m - 1,res )
+#@jit(nopython=True)
+def generate_all_cases(N, M):
+	results = []
+	generate_combinations('', N, M, results)
+	return results
 
 def Day12Pt2(inputfile):
 	print('Day 12 Part 2')
@@ -1426,19 +1445,37 @@ def Day12Pt2(inputfile):
 		lines = f.readlines()
 		f.close()
 
-	GRID_SIZE_X = len(lines[0].strip())
-	GRID_SIZE_Y = len(lines)
-	print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
-	grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
-
-	y = 0
-	jumpy=[]
-	for line in lines:
-		#map_object = map(char, line.rstrip())
-		grid[y] = list(line.strip())
-
 	res=0
-
+	N = 5
+	for line in lines:
+		line_start_time = time.time()
+		print(line, end='')
+		condition = line.split()[0] + '?' + line.split()[0] + '?' +  line.split()[0] + '?' +  line.split()[0] + '?' + line.split()[0]
+		info = list(map(int,line.split()[1].split(','))) * N
+		if 0 == condition.count('?'):
+			ret = True
+			#print (condition, info, ret)
+		else:
+			nques = condition.count('?')
+			missing_dots = len(condition) - sum(info)- condition.count(".") # expectedFailure() num of new dots
+			missing_ques = nques - missing_dots
+			#prod = list(product('#.', repeat=nques))
+			prod = generate_all_cases(missing_ques, missing_dots)
+			print("cases: ", len(prod), ' ',end='')
+			for p in prod:
+				j = 0
+				test=''
+				for i in range(len(condition)):
+					if condition[i]!='?':
+						test = test + condition[i]
+					else:
+						test = test + p[j]
+						j +=1
+				if linechecker(test, info):
+					res += 1
+				#print (condition, info, test, ret)
+		line_end_time = time.time()
+		print('res', res, 'line ended in:', line_end_time - line_start_time)
 
 	print('res:',res) #
 	end_time = time.time()
@@ -1468,5 +1505,5 @@ if __name__ == '__main__':
 	#Day10Pt2('input10.txt')
 	#Day11Pt1('input11.txt')
 	#Day11Pt2('input11.txt')
-	Day12Pt1('input12.txt')
-	#Day12Pt2('input12.txt')
+	Day12Pt1('input12_.txt')
+	#Day12Pt2('input12_.txt')
