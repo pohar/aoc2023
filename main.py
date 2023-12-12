@@ -7,6 +7,7 @@ import math
 import networkx as nx
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, Point
+from itertools import product
 
 def Findfirstdigit(str1):
 	ret=0
@@ -1352,6 +1353,29 @@ def Day11Pt2(inputfile):
 	print("End.")
 
 def Day12Pt1(inputfile):
+	def linechecker(cond, nfo):
+		ret = False
+		cond_len = len(cond) #expected sum of dots and #s
+		suminfo= sum(nfo) # expected number of #s
+		dots = len(nfo)-1 #expectedFailure() num of dots
+
+		nhash = cond.count('#')
+		ndot = cond.count('.')
+		num_separators = suminfo - cond_len # nuber of dots
+
+		result = re.findall(r"([[#]+)", cond)
+		if result:
+			found_hash_groups = len(result)
+			if found_hash_groups == len(nfo):
+				partsok=True
+				for i in range(found_hash_groups):
+					if nfo[i]!= len(result[i]):
+						partsok = False
+				if partsok:
+					ret = True
+
+		return ret
+
 	print('Day 12 Part 1')
 	start_time = time.time()
 
@@ -1359,18 +1383,34 @@ def Day12Pt1(inputfile):
 		lines = f.readlines()
 		f.close()
 
-	GRID_SIZE_X = len(lines[0].strip())
-	GRID_SIZE_Y = len(lines)
-	print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
-	grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
-
-	y = 0
-	jumpy=[]
-	for line in lines:
-		#map_object = map(char, line.rstrip())
-		grid[y] = list(line.strip())
-
 	res=0
+	for line in lines:
+		condition = line.split()[0]
+		info = list(map(int,line.split()[1].split(',')))
+		if 0 == condition.count('?'):
+			ret = True
+			print (condition, info, ret)
+		else:
+			nques = condition.count('?')
+			missing_dots = len(condition) - sum(info)- condition.count(".") # expectedFailure() num of new dots
+			prod = list(product('#.', repeat=nques))
+			for pp in prod:
+				j = 0
+				p = ''
+				for item in pp:
+					p = p + item
+				if p.count('.') == missing_dots:
+					test=''
+					for i in range(len(condition)):
+						if condition[i]!='?':
+							test = test + condition[i]
+						else:
+							test = test + p[j]
+							j +=1
+					if linechecker(test, info):
+						res += 1
+					#print (condition, info, test, ret)
+
 
 
 	print('res:',res) #
@@ -1428,5 +1468,5 @@ if __name__ == '__main__':
 	#Day10Pt2('input10.txt')
 	#Day11Pt1('input11.txt')
 	#Day11Pt2('input11.txt')
-	Day12Pt1('input12_.txt')
+	Day12Pt1('input12.txt')
 	#Day12Pt2('input12.txt')
