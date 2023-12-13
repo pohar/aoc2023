@@ -1375,8 +1375,10 @@ def Day12Pt1(inputfile):
 
 	res=0
 	for line in lines:
+		dres=0
 		condition = line.split()[0]
 		info = list(map(int,line.split()[1].split(',')))
+		print ('\n',condition, info)
 		if 0 == condition.count('?'):
 			ret = True
 			print (condition, info, ret)
@@ -1398,44 +1400,54 @@ def Day12Pt1(inputfile):
 							test = test + p[j]
 							j +=1
 					if linechecker(test, info):
+						print(test)
 						res += 1
-		#print (condition, info,  dres)
+						dres +=1
+		print (condition, info,  dres)
 
 	print('res:',res) #
 	end_time = time.time()
 	print('ended in:', end_time-start_time)
 
 
+
 def linechecker(cond, nfo):
 	ret = False
 	result = re.findall(r"([#]+)", cond)
-	if result:
-		found_hash_groups = len(result)
-		if found_hash_groups == len(nfo):
-			partsok=True
-			for i in range(found_hash_groups):
-				if nfo[i]!= len(result[i]):
-					partsok = False
-			if partsok:
-				ret = True
-
+	found_hash_groups = len(result)
+	if found_hash_groups == len(nfo):
+		partsok=True
+		for i in range(found_hash_groups):
+			if nfo[i]!= len(result[i]):
+				partsok = False
+				break
+		if partsok:
+			ret = True
 	return ret
 
-
-#@jit(nopython=True)
-def generate_combinations(prefix, n, m, res):
+def generate_combinations(prefix, n, m, cond, nfo, reres):
 	if n == 0 and m == 0:
-		res.append(prefix)
-		return
+		j = 0
+		test=''
+		for i in range(len(cond)):
+			if cond[i]!='?':
+				test = test + cond[i]
+			else:
+				test = test + prefix[j]
+				j +=1
+		if True == linechecker(test, nfo):
+			reres += 1
+		return reres
 	if n > 0:
-		generate_combinations(prefix + '#', n - 1, m, res)
+		reres = generate_combinations(prefix + '#', n - 1, m, cond, nfo, reres)
 	if m > 0:
-		generate_combinations(prefix + '.', n, m - 1,res )
-#@jit(nopython=True)
-def generate_all_cases(N, M):
-	results = []
-	generate_combinations('', N, M, results)
-	return results
+		reres = generate_combinations(prefix + '.', n, m - 1, cond, nfo, reres )
+
+	return reres
+
+def generate_all_cases(N, M, cond, nfo):
+	reres = generate_combinations('', N, M,  cond, nfo, 0)
+	return reres
 
 def Day12Pt2(inputfile):
 	print('Day 12 Part 2')
@@ -1446,38 +1458,206 @@ def Day12Pt2(inputfile):
 		f.close()
 
 	res=0
-	N = 5
+	ind=0
 	for line in lines:
 		line_start_time = time.time()
-		print(line, end='')
-		condition = line.split()[0] + '?' + line.split()[0] + '?' +  line.split()[0] + '?' +  line.split()[0] + '?' + line.split()[0]
-		info = list(map(int,line.split()[1].split(','))) * N
-		if 0 == condition.count('?'):
-			ret = True
-			#print (condition, info, ret)
-		else:
-			nques = condition.count('?')
-			missing_dots = len(condition) - sum(info)- condition.count(".") # expectedFailure() num of new dots
-			missing_ques = nques - missing_dots
-			#prod = list(product('#.', repeat=nques))
-			prod = generate_all_cases(missing_ques, missing_dots)
-			print("cases: ", len(prod), ' ',end='')
-			for p in prod:
-				j = 0
-				test=''
-				for i in range(len(condition)):
-					if condition[i]!='?':
-						test = test + condition[i]
-					else:
-						test = test + p[j]
-						j +=1
-				if linechecker(test, info):
-					res += 1
-				#print (condition, info, test, ret)
+
+		# N = 1
+		condition = line.split()[0] # + '?' + line.split()[0] + '?' +  line.split()[0] + '?' +  line.split()[0] + '?' + line.split()[0]
+		info = list(map(int,line.split()[1].split(',')))
+		nques = condition.count('?')
+		missing_dots = len(condition) - sum(info)- condition.count(".") # expectedFailure() num of new dots
+		missing_ques = nques - missing_dots
+		dres = generate_all_cases(missing_ques, missing_dots, condition, info)
+
+		# N=2
+		condition = line.split()[0] + '?' + line.split()[0] # + '?' +  line.split()[0] + '?' +  line.split()[0] + '?' + line.split()[0]
+		info = list(map(int,line.split()[1].split(',')) )* 2
+		nques = condition.count('?')
+		missing_dots = len(condition) - sum(info)- condition.count(".") # expectedFailure() num of new dots
+		missing_ques = nques - missing_dots
+		eres = generate_all_cases(missing_ques, missing_dots, condition, info)
+
+		mult = eres/dres
+		fres = int(dres * mult ** 4)
+
+		res +=fres
 		line_end_time = time.time()
-		print('res', res, 'line ended in:', line_end_time - line_start_time)
+		print(ind,'res', res, 'fres',fres,'line ended in:', line_end_time - line_start_time)
+		ind +=1
 
 	print('res:',res) #
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
+def Day13Pt1(inputfile):
+	def ColumnsEqual(area, x1, x2, maxy):
+		is_ok = True
+		for y in range(maxy):
+			if area[y][x1] != area[y][x2]:
+				is_ok = False
+				break
+		return is_ok
+
+	def RowsEqual(area, y1, y2, maxx):
+		is_ok = True
+		if area[y1]!= area[y2]:
+			is_ok = False
+		return is_ok
+
+	print('Day 13 Part 1')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	if False:
+		GRID_SIZE_X = len(lines[0].strip())
+		GRID_SIZE_Y = len(lines)
+		print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+		grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+
+	starty = 0
+	grid=[]
+	res=0
+	for y,line in enumerate(lines):
+		if len(line)>1:
+			grid.append( list(line.strip()))
+		else:
+			vmirr=[]
+			hmirr=[]
+			GRID_SIZE_X = len(grid[0])
+			GRID_SIZE_Y = len(grid)
+			print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+
+			#find vertical mirror (without using mirror)
+			for x1 in range(GRID_SIZE_X-1):
+				x2=x1+1
+				if ColumnsEqual(grid, x1, x2, GRID_SIZE_Y):
+					x3=x1-1
+					x4=x2+1
+					ok=True
+					while(x3>=0) and (x4<GRID_SIZE_X) and ok:
+						if ColumnsEqual(grid, x3, x4, GRID_SIZE_Y):
+							x3 -=  1
+							x4 += 1
+						else:
+							ok=False
+					if ok:
+						res += x1+1
+						vmirr.append(x1)
+			print("vmirr:", vmirr)
+
+			#find vertical mirror (without using mirror)
+			for y1 in range(GRID_SIZE_Y-1):
+				y2=y1+1
+				if RowsEqual(grid, y1, y2, GRID_SIZE_X):
+					y3=y1-1
+					y4=y2+1
+					ok=True
+					while(y3>=0) and (y4<GRID_SIZE_Y) and ok:
+						if RowsEqual(grid, y3, y4, GRID_SIZE_X):
+							y3 -=  1
+							y4 += 1
+						else:
+							ok=False
+					if ok:
+						res += (y1+1)*100
+						hmirr.append(y1)
+			print("hmirr:", hmirr)
+
+			grid = []
+
+	print('res:',res) #
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
+
+def Day13Pt2(inputfile):
+	def ColumnsDiff(area, x1, x2, maxy):
+		diff = 0
+		for y in range(maxy):
+			if area[y][x1] != area[y][x2]:
+				diff +=1
+		return diff
+
+	def RowsDiff(area, y1, y2, maxx):
+		diff = 0
+		for x in range(maxx):
+			if area[y1][x] != area[y2][x]:
+				diff +=1
+		return diff
+
+	print('Day 13 Part 2')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	if False:
+		GRID_SIZE_X = len(lines[0].strip())
+		GRID_SIZE_Y = len(lines)
+		print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+		grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+
+	starty = 0
+	grid=[]
+	res=0
+	for y,line in enumerate(lines):
+		if len(line)>1:
+			grid.append( list(line.strip()))
+		else:
+			vmirr=[]
+			hmirr=[]
+			GRID_SIZE_X = len(grid[0])
+			GRID_SIZE_Y = len(grid)
+			print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+
+			#find vertical mirror (without using mirror)
+			for x1 in range(GRID_SIZE_X-1):
+				x2=x1+1
+				sumd=0
+				x3=x1
+				x4=x2
+				ok=True
+				while(x3>=0) and (x4<GRID_SIZE_X) and ok :
+					d=ColumnsDiff(grid, x3, x4, GRID_SIZE_Y)
+					x3 -=  1
+					x4 += 1
+					if d>0:
+						sumd += d
+						if sumd>1:
+							ok=False
+				if 1==sumd:
+					res += x1+1
+					vmirr.append(x1)
+			print("vmirr:", vmirr)
+
+			#find horizontal mirror (without using mirror)
+			for y1 in range(GRID_SIZE_Y-1):
+				y2=y1+1
+				sumd=0
+				y3=y1
+				y4=y2
+				ok=True
+				while(y3>=0) and (y4<GRID_SIZE_Y) and ok:
+					d =RowsDiff(grid, y3, y4, GRID_SIZE_X)
+					y3 -=  1
+					y4 += 1
+					if d>0:
+						sumd += d
+						if sumd>1:
+							ok=False
+				if 1==sumd:
+					res += (y1+1)*100
+					hmirr.append(y1)
+			print("hmirr:", hmirr)
+
+			grid = []
+
+	print('res:',res)  # too low: 29112
 	end_time = time.time()
 	print('ended in:', end_time-start_time)
 
@@ -1505,5 +1685,7 @@ if __name__ == '__main__':
 	#Day10Pt2('input10.txt')
 	#Day11Pt1('input11.txt')
 	#Day11Pt2('input11.txt')
-	Day12Pt1('input12_.txt')
-	#Day12Pt2('input12_.txt')
+	#Day12Pt1('input12_.txt')
+	#Day12Pt2('input12.txt') # not working
+	#Day13Pt1('input13.txt')
+	Day13Pt2('input13.txt')
