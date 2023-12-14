@@ -1661,6 +1661,155 @@ def Day13Pt2(inputfile):
 	end_time = time.time()
 	print('ended in:', end_time-start_time)
 
+def Day14Pt1(inputfile):
+	def printgrid(grid_, x1, y1, x2, y2):
+		for y in range(y1, y2 ):
+			for x in range(x1, x2 ):
+				print(grid_[y][x], end="")
+			print("")
+		return
+
+	def MoveRocks(area,x,y):
+		if (0==x) and (-1==y): # move north
+			for y in range(GRID_SIZE_Y-1):
+				for x in range(GRID_SIZE_X):
+					ym=y
+					while ('.'==grid[ym][x]) and (ym<GRID_SIZE_Y-1):
+						ym += 1
+					if (ym!=y) and ('O'==grid[ym][x]):
+						grid[y][x]='O'
+						grid[ym][x]='.'
+		return
+
+	print('Day 14 Part 1')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	GRID_SIZE_X = len(lines[0].strip())
+	GRID_SIZE_Y = len(lines)
+	print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+	grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+	y=0
+	for line in lines:
+		grid[y] = list(line.strip())
+		y+=1
+	#printgrid(grid,0,0, GRID_SIZE_X, GRID_SIZE_Y)
+
+	MoveRocks(grid,0,-1)
+	print("Move North")
+	#printgrid(grid,0,0, GRID_SIZE_X, GRID_SIZE_Y)
+
+	res=0
+	for y in range(GRID_SIZE_Y):
+		subres = grid[y].count('O') * (GRID_SIZE_Y-y)
+		#print(subres)
+		res += subres
+
+	print('res:',res)
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
+
+
+def MoveRocks(grid,GRID_SIZE_X,GRID_SIZE_Y):
+	# move north
+	for y in range(GRID_SIZE_Y - 1):
+		for x in range(GRID_SIZE_X):
+			ym = y
+			while ('.' == grid[ym][x]) and (ym < GRID_SIZE_Y - 1):
+				ym += 1
+			if (ym != y) and ('O' == grid[ym][x]):
+				grid[y][x] = 'O'
+				grid[ym][x] = '.'
+
+	# move west
+	for x in range(GRID_SIZE_X-1):
+		for y in range(GRID_SIZE_Y):
+			xm=x
+			while ('.'==grid[y][xm]) and (xm<GRID_SIZE_X-1):
+				xm += 1
+			if (xm!=x) and ('O'==grid[y][xm]):
+				grid[y][x]='O'
+				grid[y][xm]='.'
+
+	# move south
+	for y in range(GRID_SIZE_Y-1,0,-1):
+		for x in range(GRID_SIZE_X):
+			ym=y
+			while ('.'==grid[ym][x]) and (ym>0):
+				ym -= 1
+			if (ym!=y) and ('O'==grid[ym][x]):
+				grid[y][x]='O'
+				grid[ym][x]='.'
+
+	#east
+	for x in range(GRID_SIZE_X-1,0,-1):
+		for y in range(GRID_SIZE_Y):
+			xm=x
+			while ('.'==grid[y][xm]) and (xm>0):
+				xm -= 1
+			if (xm!=x) and ('O'==grid[y][xm]):
+				grid[y][x]='O'
+				grid[y][xm]='.'
+	return
+def Day14Pt2(inputfile):
+	def printgrid(grid_, x1, y1, x2, y2):
+		for y in range(y1, y2 ):
+			for x in range(x1, x2 ):
+				print(grid_[y][x], end="")
+			print("")
+		return
+
+	print('Day 14 Part 2')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	GRID_SIZE_X = len(lines[0].strip())
+	GRID_SIZE_Y = len(lines)
+	print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+	#grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+	grid=list()
+	y=0
+	for line in lines:
+		grid.append(list(line.strip()))
+		y+=1
+	#printgrid(grid,0,0, GRID_SIZE_X, GRID_SIZE_Y)
+
+	states = []
+	i=0
+	while i <1_000_000_000:
+		currstate=hash(tuple(map(tuple, grid)))
+		if currstate not in states:
+			states.append(currstate)
+			MoveRocks(grid,GRID_SIZE_X,GRID_SIZE_Y)
+			i += 1
+		else:
+			ind = states.index(currstate)
+			print("found earlier state:" , i, " ==" , ind)
+			cyclen=i-ind
+			#while (i+cyclen) < 1_000_000_000:
+			#	i+=cyclen
+			i = (1_000_000_000 + ind - (1_000_000_000 % cyclen) - cyclen)
+			states.clear() #hack
+			print("new i:", i)
+
+	#calculate result
+	res=0
+	for y in range(GRID_SIZE_Y):
+		subres = grid[y].count('O') * (GRID_SIZE_Y-y)
+		#print(subres)
+		res += subres
+
+	print('res:',res) #118747
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
 if __name__ == '__main__':
 	#Day1Pt1('input1_.txt')
 	#Day1Pt2('input1.txt')
@@ -1688,4 +1837,6 @@ if __name__ == '__main__':
 	#Day12Pt1('input12_.txt')
 	#Day12Pt2('input12.txt') # not working
 	#Day13Pt1('input13.txt')
-	Day13Pt2('input13.txt')
+	#Day13Pt2('input13.txt')
+	#Day14Pt1('input14.txt')
+	Day14Pt2('input14.txt')
