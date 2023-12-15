@@ -1810,6 +1810,83 @@ def Day14Pt2(inputfile):
 	end_time = time.time()
 	print('ended in:', end_time-start_time)
 
+def Day15Pt1(inputfile):
+	print('Day 15 Part 1')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	res = 0
+	for line in lines:
+		parts = line.strip().split(',')
+		for part in parts:
+			currentvalue = 0
+			for c in part:
+				currentvalue += ord(c)
+				currentvalue *= 17
+				currentvalue = 	currentvalue % 256
+			#print(part, currentvalue)
+			res += currentvalue
+
+	print('res:',res)
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
+
+def Day15Pt2(inputfile):
+	print('Day 15 Part 2')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	#boxes= {} * 256
+	boxes = [{} for i in range(256)]
+	for line in lines:
+		parts = line.strip().split(',')
+		for part in parts:
+			currentvalue = 0
+			if part.count('-'):
+				mykey = part[:-1]
+			else:
+				mykey,_ = part.split('=')
+			for c in mykey:
+				currentvalue += ord(c)
+				currentvalue *= 17
+				currentvalue = 	currentvalue % 256
+			#print(part, currentvalue)
+			if part.count('-'):
+				if mykey in boxes[currentvalue].keys():
+					boxes[currentvalue].pop(mykey)
+			else:
+				_,value = part.split('=')
+				#print(currentvalue,mykey)
+				boxes[currentvalue][mykey] = value
+
+	res=0
+	print("boxes:", boxes)
+	slotindex=1
+	prevbox=-1
+	for i,box in enumerate(boxes):
+		for key in box:
+			boxno = i+1
+			if (prevbox!=-1) and (boxno!=prevbox):
+				slotindex = 1
+
+			focallen = box[key]
+			subres = int(boxno) * slotindex * int(focallen)
+			print(key, subres)
+			res += subres
+			slotindex +=1
+			prevbox = boxno
+
+	print('res:',res)
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
 if __name__ == '__main__':
 	#Day1Pt1('input1_.txt')
 	#Day1Pt2('input1.txt')
@@ -1839,4 +1916,6 @@ if __name__ == '__main__':
 	#Day13Pt1('input13.txt')
 	#Day13Pt2('input13.txt')
 	#Day14Pt1('input14.txt')
-	Day14Pt2('input14.txt')
+	#Day14Pt2('input14.txt')
+	#Day15Pt1('input15.txt')
+	Day15Pt2('input15.txt')
