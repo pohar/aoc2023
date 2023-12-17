@@ -1887,6 +1887,243 @@ def Day15Pt2(inputfile):
 	end_time = time.time()
 	print('ended in:', end_time-start_time)
 
+def Day16Pt1(inputfile):
+	def printgrid(grid_, x1, y1, x2, y2):
+		for y in range(y1, y2 ):
+			for x in range(x1, x2 ):
+				print('#' if (x,y) in grid_ else'.', end="")
+			print("")
+		return
+
+	print('Day 16 Part 1')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	GRID_SIZE_X = len(lines[0].strip())
+	GRID_SIZE_Y = len(lines)
+	print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+	#grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+	grid=list()
+	for line in lines:
+		grid.append(list(line.rstrip()))
+
+	#dirs 0=right, 1 = down, 2,=left, 3 = up
+	beams=[]
+	energized={}
+	visited={}
+	beams.append((0,0,0)) # x,y,dir
+	while beams:
+		newbeams=[]
+		for i  in range(len(beams)):
+			x,y,dir = beams[i]
+			energized[(x,y)]=1
+			bounced = False
+			if '.' == grid[y][x]:
+				if 0 == dir:
+					x += 1
+				elif 2 == dir:
+					x -= 1
+				elif 1 == dir:
+					y += 1
+				elif 3 == dir:
+					y -= 1
+			elif '/' == grid[y][x]:
+				if 0 == dir:
+					dir = 3
+					y -= 1
+				elif 2 == dir:
+					dir = 1
+					y += 1
+				elif 1 == dir:
+					dir = 2
+					x -= 1
+				elif 3 == dir:
+					dir  = 0
+					x += 1
+			elif "\\" == grid[y][x]:
+				if 0 == dir:
+					dir = 1
+					y += 1
+				elif 2 == dir:
+					dir = 3
+					y -= 1
+				elif 1 == dir:
+					dir = 0
+					x += 1
+				elif 3 == dir:
+					dir  = 2
+					x -= 1
+			elif "|" == grid[y][x]:
+				if (0 == dir) or (2 ==dir):
+					bounced = True
+					if not((y-1 < 0) or (x < 0) or (y-1 >= GRID_SIZE_Y) or (x >= GRID_SIZE_X)):
+						newbeams.append((x,y-1,3)) #bounce
+					if not ((y+1 < 0) or (x < 0) or (y+1 >= GRID_SIZE_Y) or (x >= GRID_SIZE_X)):
+						newbeams.append((x , y+1, 1))  # bounce
+				elif 1 == dir:
+					y += 1
+				elif 3 == dir:
+					y -= 1
+			elif "-" == grid[y][x]:
+				if 0 == dir:
+					x += 1
+				elif 2 == dir:
+					x -= 1
+				elif (1 == dir) or (3 == dir):
+					bounced = True
+					if not((y < 0) or (x-1 < 0) or (y >= GRID_SIZE_Y) or (x-1 >= GRID_SIZE_X)):
+						newbeams.append((x-1 , y, 2))  # bounce new ray
+					if not((y < 0) or (x+1 < 0) or (y >= GRID_SIZE_Y) or (x+1 >= GRID_SIZE_X)):
+						newbeams.append((x+1 , y, 0))  # bounce
+
+			if not((y<0) or (x<0) or (y>=GRID_SIZE_Y) or (x>=GRID_SIZE_X)) and not bounced:
+				newbeams.append((x,y,dir)) # remain active
+		beams=[]
+		for nb in newbeams:
+			if nb not in visited:
+				visited[nb]=1
+				beams.append(nb)
+		#printgrid(energized, 0, 0, GRID_SIZE_X, GRID_SIZE_Y)
+		#print(10 * '=')
+		#print(beams) #, energized)
+
+	res = len(energized)
+
+	print('res:',res)
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
+def Day16Pt2(inputfile):
+	def printgrid(grid_, x1, y1, x2, y2):
+		for y in range(y1, y2 ):
+			for x in range(x1, x2 ):
+				print('#' if (x,y) in grid_ else'.', end="")
+			print("")
+		return
+
+	print('Day 16 Part 2')
+	start_time = time.time()
+
+	with open(inputfile, 'r') as f:
+		lines = f.readlines()
+		f.close()
+
+	GRID_SIZE_X = len(lines[0].strip())
+	GRID_SIZE_Y = len(lines)
+	print(f'Grid size: y: {GRID_SIZE_X} x: {GRID_SIZE_Y}')
+	#grid = [[0 for j in range(GRID_SIZE_X)] for i in range(GRID_SIZE_Y)]
+	grid=list()
+	for line in lines:
+		grid.append(list(line.rstrip()))
+
+	#dirs 0=right, 1 = down, 2,=left, 3 = up
+	res = 0
+	for startx in range(GRID_SIZE_X):
+		subres = method_name(startx, 0, 1, GRID_SIZE_X, GRID_SIZE_Y, grid)
+		if subres > res:
+			res = subres
+
+		subres = method_name(startx, GRID_SIZE_Y-1, 3, GRID_SIZE_X, GRID_SIZE_Y, grid)
+		if subres > res:
+			res = subres
+
+	for starty in range(GRID_SIZE_Y):
+		subres = method_name(0, starty, 1, GRID_SIZE_X, GRID_SIZE_Y, grid)
+		if subres > res:
+			res = subres
+
+		subres = method_name(GRID_SIZE_X-1, starty, 3, GRID_SIZE_X, GRID_SIZE_Y, grid)
+		if subres > res:
+			res = subres
+
+	print('res:',res)
+	end_time = time.time()
+	print('ended in:', end_time-start_time)
+
+
+def method_name(sx,sy,sdir, GRID_SIZE_X, GRID_SIZE_Y, grid):
+	beams = []
+	energized = {}
+	visited = {}
+	beams.append((sx, sy, sdir))  # x,y,dir
+	visited[(sx, sy, sdir)]=1
+	while beams:
+		newbeams = []
+		for i in range(len(beams)):
+			x, y, dir = beams[i]
+			energized[(x, y)] = 1
+			bounced = False
+			if '.' == grid[y][x]:
+				if 0 == dir:
+					x += 1
+				elif 2 == dir:
+					x -= 1
+				elif 1 == dir:
+					y += 1
+				elif 3 == dir:
+					y -= 1
+			elif '/' == grid[y][x]:
+				if 0 == dir:
+					dir = 3
+					y -= 1
+				elif 2 == dir:
+					dir = 1
+					y += 1
+				elif 1 == dir:
+					dir = 2
+					x -= 1
+				elif 3 == dir:
+					dir = 0
+					x += 1
+			elif "\\" == grid[y][x]:
+				if 0 == dir:
+					dir = 1
+					y += 1
+				elif 2 == dir:
+					dir = 3
+					y -= 1
+				elif 1 == dir:
+					dir = 0
+					x += 1
+				elif 3 == dir:
+					dir = 2
+					x -= 1
+			elif "|" == grid[y][x]:
+				if (0 == dir) or (2 == dir):
+					bounced = True
+					if not ((y - 1 < 0) or (x < 0) or (y - 1 >= GRID_SIZE_Y) or (x >= GRID_SIZE_X)):
+						newbeams.append((x, y - 1, 3))  # bounce
+					if not ((y + 1 < 0) or (x < 0) or (y + 1 >= GRID_SIZE_Y) or (x >= GRID_SIZE_X)):
+						newbeams.append((x, y + 1, 1))  # bounce
+				elif 1 == dir:
+					y += 1
+				elif 3 == dir:
+					y -= 1
+			elif "-" == grid[y][x]:
+				if 0 == dir:
+					x += 1
+				elif 2 == dir:
+					x -= 1
+				elif (1 == dir) or (3 == dir):
+					bounced = True
+					if not ((y < 0) or (x - 1 < 0) or (y >= GRID_SIZE_Y) or (x - 1 >= GRID_SIZE_X)):
+						newbeams.append((x - 1, y, 2))  # bounce new ray
+					if not ((y < 0) or (x + 1 < 0) or (y >= GRID_SIZE_Y) or (x + 1 >= GRID_SIZE_X)):
+						newbeams.append((x + 1, y, 0))  # bounce
+
+			if not ((y < 0) or (x < 0) or (y >= GRID_SIZE_Y) or (x >= GRID_SIZE_X)) and not bounced:
+				newbeams.append((x, y, dir))  # remain active
+		beams = []
+		for nb in newbeams:
+			if nb not in visited:
+				visited[nb] = 1
+				beams.append(nb)
+	res = len(energized)
+	return res
+
 if __name__ == '__main__':
 	#Day1Pt1('input1_.txt')
 	#Day1Pt2('input1.txt')
@@ -1918,4 +2155,6 @@ if __name__ == '__main__':
 	#Day14Pt1('input14.txt')
 	#Day14Pt2('input14.txt')
 	#Day15Pt1('input15.txt')
-	Day15Pt2('input15.txt')
+	#Day15Pt2('input15.txt')
+	#Day16Pt1('input16.txt')
+	Day16Pt2('input16.txt')
